@@ -1053,8 +1053,8 @@ UINT StMakeOpenVpnConfigFile(ADMIN *a, RPC_READ_LOG_FILE *t)
 	UINT ret = ERR_NO_ERROR;
 	ZIP_PACKER *p;
 	FIFO *f;
-	BUF *readme_buf;
-	BUF *readme_pdf_buf;
+//	BUF *readme_buf;
+//	BUF *readme_pdf_buf;
 	BUF *sample_buf;
 	OPENVPN_SSTP_CONFIG config;
 	LIST *port_list;
@@ -1081,11 +1081,11 @@ UINT StMakeOpenVpnConfigFile(ADMIN *a, RPC_READ_LOG_FILE *t)
 
 	p = NewZipPacker();
 
-	// readme.txt
-	readme_buf = ReadDump("|openvpn_readme.txt");
-
-	// readme.pdf
-	readme_pdf_buf = ReadDump("|openvpn_readme.pdf");
+//	// readme.txt
+//	readme_buf = ReadDump("|openvpn_readme.txt");
+//
+//	// readme.pdf
+//	readme_pdf_buf = ReadDump("|openvpn_readme.pdf");
 
 	// sample.ovpn
 	sample_buf = ReadDump("|openvpn_sample.ovpn");
@@ -1094,7 +1094,8 @@ UINT StMakeOpenVpnConfigFile(ADMIN *a, RPC_READ_LOG_FILE *t)
 	GetMachineHostName(my_hostname, sizeof(my_hostname));
 	my_hostname[16] = 0;
 
-	if (readme_buf == NULL || sample_buf == NULL || readme_pdf_buf == NULL)
+//	if (readme_buf == NULL || sample_buf == NULL || readme_pdf_buf == NULL)
+	if (sample_buf == NULL)
 	{
 		ret = ERR_INTERNAL_ERROR;
 	}
@@ -1279,8 +1280,8 @@ UINT StMakeOpenVpnConfigFile(ADMIN *a, RPC_READ_LOG_FILE *t)
 			StrLower(my_hostname);
 		}
 
-		ZipAddFileSimple(p, "readme.txt", LocalTime64(), 0, readme_buf->Buf, readme_buf->Size);
-		ZipAddFileSimple(p, "readme.pdf", LocalTime64(), 0, readme_pdf_buf->Buf, readme_pdf_buf->Size);
+//		ZipAddFileSimple(p, "readme.txt", LocalTime64(), 0, readme_buf->Buf, readme_buf->Size);
+//		ZipAddFileSimple(p, "readme.pdf", LocalTime64(), 0, readme_pdf_buf->Buf, readme_pdf_buf->Size);
 
 		ReplaceStrEx((char *)config_l3_buf->Buf, config_l3_buf->Size, (char *)config_l3_buf->Buf,
 			"$TAG_TUN_TAP$", "tun", false);
@@ -1358,9 +1359,9 @@ UINT StMakeOpenVpnConfigFile(ADMIN *a, RPC_READ_LOG_FILE *t)
 			SeekBuf(t->Buffer, 0, 0);
 		}
 
-		FreeBuf(readme_buf);
+//		FreeBuf(readme_buf);
 		FreeBuf(sample_buf);
-		FreeBuf(readme_pdf_buf);
+//		FreeBuf(readme_pdf_buf);
 		FreeBuf(x_buf);
 
 		FreeX(dummy_x);
