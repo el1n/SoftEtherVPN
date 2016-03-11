@@ -1336,7 +1336,7 @@ void CleanupCedar(CEDAR *c)
 		return;
 	}
 
-	WuFreeWebUI(c->WebUI);
+//	WuFreeWebUI(c->WebUI);
 	FreeCedarLayer3(c);
 
 /*
@@ -1762,7 +1762,7 @@ CEDAR *NewCedar(X *server_x, K *server_k)
 
 	InitCedarLayer3(c);
 
-	c->WebUI = WuNewWebUI(c);
+//	c->WebUI = WuNewWebUI(c);
 
 #ifdef	ALPHA_VERSION
 	beta_str = "Alpha";

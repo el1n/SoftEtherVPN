@@ -279,7 +279,7 @@ struct SERVER
 	UCHAR MyRandomKey[SHA1_SIZE];		// Their own random key
 	bool FarmControllerInited;			// Initialization of farm controller has been completed
 	bool DisableDeadLockCheck;			// Disable the deadlock check
-	bool UseWebUI;						// Use the WebUI
+//	bool UseWebUI;						// Use the WebUI
 	bool SaveDebugLog;					// Save the debug log
 	bool NoSendSignature;				// Let the client not to send a signature
 	bool UseWebTimePage;				// Use WebTimePage

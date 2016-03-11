@@ -1033,7 +1033,7 @@ typedef struct CEDAR
 	COUNTER *AssignedBridgeLicense;	// Number of assigned bridge licenses
 	UINT64 LicenseViolationTick;	// License violation occurs
 	LIST *NonSslList;				// Non-SSL connection list
-	struct WEBUI *WebUI;			// Data for WebUI service
+//	struct WEBUI *WebUI;			// Data for WebUI service
 	UINT Beta;						// Beta number
 	LOCK *CedarSuperLock;			// Cedar super lock!
 	bool DisableIPv6Listener;		// Disable IPv6 listener
@@ -1158,8 +1158,8 @@ typedef struct CEDAR
 // User-mode Router
 #include <Cedar/Nat.h>
 
-// Web UI
-#include <Cedar/WebUI.h>
+//// Web UI
+//#include <Cedar/WebUI.h>
 
 // VPN Gate Plugin DLL
 #include <VGate/VGateCommon.h>

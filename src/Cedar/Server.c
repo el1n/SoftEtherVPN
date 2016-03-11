@@ -5922,8 +5922,8 @@ void SiLoadServerCfg(SERVER *s, FOLDER *f)
 		SetEraserCheckInterval(CfgGetInt(f, "AutoDeleteCheckIntervalSecs"));
 		s->Eraser = NewEraser(s->Logger, CfgGetInt64(f, "AutoDeleteCheckDiskFreeSpaceMin"));
 
-		// WebUI
-		s->UseWebUI = CfgGetBool(f, "UseWebUI");
+//		// WebUI
+//		s->UseWebUI = CfgGetBool(f, "UseWebUI");
 
 
 		// WebTimePage
@@ -6322,8 +6322,8 @@ void SiWriteServerCfg(FOLDER *f, SERVER *s)
 		CfgAddInt64(f, "AutoDeleteCheckDiskFreeSpaceMin", s->Eraser->MinFreeSpace);
 		CfgAddInt(f, "AutoDeleteCheckIntervalSecs", GetEraserCheckInterval());
 
-		// WebUI
-		CfgAddBool(f, "UseWebUI", s->UseWebUI);
+//		// WebUI
+//		CfgAddBool(f, "UseWebUI", s->UseWebUI);
 
 
 		// NoLinuxArpFilter

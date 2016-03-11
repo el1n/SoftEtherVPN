@@ -6291,22 +6291,22 @@ bool ServerDownloadSignature(CONNECTION *c, char **error_detail_str)
 				{
 					bool b = false;
 
-					// Show the WebUI if the configuration allow to use the WebUI
-					if (c->Cedar->Server != NULL && c->Cedar->Server->UseWebUI)
-					{
-						WU_WEBPAGE *page;
-
-						// Show the WebUI
-						page = WuGetPage(h->Target, c->Cedar->WebUI);
-
-						if (page != NULL)
-						{
-							PostHttp(s, page->header, page->data, page->size);
-							b = true;
-							WuFreeWebPage(page);
-						}
-
-					}
+//					// Show the WebUI if the configuration allow to use the WebUI
+//					if (c->Cedar->Server != NULL && c->Cedar->Server->UseWebUI)
+//					{
+//						WU_WEBPAGE *page;
+//
+//						// Show the WebUI
+//						page = WuGetPage(h->Target, c->Cedar->WebUI);
+//
+//						if (page != NULL)
+//						{
+//							PostHttp(s, page->header, page->data, page->size);
+//							b = true;
+//							WuFreeWebPage(page);
+//						}
+//
+//					}
 
 					if (c->FirstSock->RemoteIP.addr[0] == 127)
 					{
