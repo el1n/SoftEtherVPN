@@ -152,17 +152,17 @@ struct TABLE
 #define	_E(name)		(GetUniErrorStr((UINT)(name)))
 #define	_EA(name)		(GetErrorStr((UINT)(name)))
 //#define _GETLANG()		(_II("LANG"))
-
-// Language list
-struct LANGLIST
-{
-	UINT Id;						// Number
-	char Name[32];					// Identifier
-	wchar_t TitleEnglish[128];		// English notation
-	wchar_t TitleLocal[128];		// Local notation
-	LIST *LcidList;					// Windows LCID list
-	LIST *LangList;					// UNIX LANG environment variable list
-};
+//
+//// Language list
+//struct LANGLIST
+//{
+//	UINT Id;						// Number
+//	char Name[32];					// Identifier
+//	wchar_t TitleEnglish[128];		// English notation
+//	wchar_t TitleLocal[128];		// Local notation
+//	LIST *LcidList;					// Windows LCID list
+//	LIST *LangList;					// UNIX LANG environment variable list
+//};
 
 
 // Function prototype
