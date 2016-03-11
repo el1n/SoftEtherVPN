@@ -925,12 +925,12 @@ void InitInternational()
 {
 #ifdef	OS_UNIX
 //	void *d;
-//
-//	if (iconv_lock != NULL)
-//	{
-//		return;
-//	}
-//
+
+	if (iconv_lock != NULL)
+	{
+		return;
+	}
+
 //	GetCurrentCharSet(charset, sizeof(charset));
 //	d = IconvWideToStrInternal();
 //	if (d == (void *)-1)
