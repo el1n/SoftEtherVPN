@@ -282,7 +282,7 @@ struct SERVER
 //	bool UseWebUI;						// Use the WebUI
 	bool SaveDebugLog;					// Save the debug log
 	bool NoSendSignature;				// Let the client not to send a signature
-	bool UseWebTimePage;				// Use WebTimePage
+//	bool UseWebTimePage;				// Use WebTimePage
 	bool NoLinuxArpFilter;				// Not to set arp_filter in Linux
 	bool NoHighPriorityProcess;			// Not to raise the priority of the process
 	bool NoDebugDump;					// Not to output the debug dump

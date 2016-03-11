@@ -5926,8 +5926,8 @@ void SiLoadServerCfg(SERVER *s, FOLDER *f)
 //		s->UseWebUI = CfgGetBool(f, "UseWebUI");
 
 
-		// WebTimePage
-		s->UseWebTimePage = CfgGetBool(f, "UseWebTimePage");
+//		// WebTimePage
+//		s->UseWebTimePage = CfgGetBool(f, "UseWebTimePage");
 
 		// NoLinuxArpFilter
 		s->NoLinuxArpFilter = CfgGetBool(f, "NoLinuxArpFilter");
@@ -6377,8 +6377,8 @@ void SiWriteServerCfg(FOLDER *f, SERVER *s)
 			CfgAddStr(f, "OpenVPN_UdpPortList", config.OpenVPNPortList);
 		}
 
-		// WebTimePage
-		CfgAddBool(f, "UseWebTimePage", s->UseWebTimePage);
+//		// WebTimePage
+//		CfgAddBool(f, "UseWebTimePage", s->UseWebTimePage);
 
 		// Debug log
 		CfgAddBool(f, "SaveDebugLog", s->SaveDebugLog);
