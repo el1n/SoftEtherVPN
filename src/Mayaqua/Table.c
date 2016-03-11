@@ -125,16 +125,16 @@
 // List of TABLE
 static LIST *TableList = NULL;
 static wchar_t old_table_name[MAX_SIZE] = {0};		// Old table name
-static LANGLIST current_lang = {0};
-static LANGLIST current_os_lang = {0};
+//static LANGLIST current_lang = {0};
+//static LANGLIST current_os_lang = {0};
 
 // Initialization of string table routine
 void InitTable()
 {
-	LIST *o;
-	char tmp[MAX_SIZE];
-	LANGLIST *e = NULL;
-	LANGLIST *os_lang = NULL;
+//	LIST *o;
+//	char tmp[MAX_SIZE];
+//	LANGLIST *e = NULL;
+//	LANGLIST *os_lang = NULL;
 	char table_name[MAX_SIZE];
 	if (MayaquaIsMinimalMode())
 	{
@@ -142,510 +142,513 @@ void InitTable()
 		return;
 	}
 
-	o = LoadLangList();
-	if (o == NULL)
-	{
-LABEL_FATAL_ERROR:
-		Alert("Fatal Error: The file \"hamcore.se2\" is missing or broken.\r\nPlease check hamcore.se2.\r\n\r\n(First, reboot the computer. If this problem occurs again, please reinstall VPN software files.)", NULL);
-		exit(-1);
-		return;
-	}
-
-	// Read the lang.config
-	if (LoadLangConfigCurrentDir(tmp, sizeof(tmp)))
-	{
-		e = GetBestLangByName(o, tmp);
-	}
-
-	os_lang = GetBestLangForCurrentEnvironment(o);
-
-	if (e == NULL)
-	{
-		e = os_lang;
-	}
-
-	if (e == NULL)
-	{
-		goto LABEL_FATAL_ERROR;
-	}
-
-	SaveLangConfigCurrentDir(e->Name);
-
-	Copy(&current_lang, e, sizeof(LANGLIST));
-	Copy(&current_os_lang, os_lang, sizeof(LANGLIST));
-
-	current_lang.LangList = current_lang.LcidList = NULL;
-	current_os_lang.LangList = current_os_lang.LcidList = NULL;
+//	o = LoadLangList();
+//	if (o == NULL)
+//	{
+//LABEL_FATAL_ERROR:
+//		Alert("Fatal Error: The file \"hamcore.se2\" is missing or broken.\r\nPlease check hamcore.se2.\r\n\r\n(First, reboot the computer. If this problem occurs again, please reinstall VPN software files.)", NULL);
+//		exit(-1);
+//		return;
+//	}
+//
+//	// Read the lang.config
+//	if (LoadLangConfigCurrentDir(tmp, sizeof(tmp)))
+//	{
+//		e = GetBestLangByName(o, tmp);
+//	}
+//
+//	os_lang = GetBestLangForCurrentEnvironment(o);
+//
+//	if (e == NULL)
+//	{
+//		e = os_lang;
+//	}
+//
+//	if (e == NULL)
+//	{
+//		goto LABEL_FATAL_ERROR;
+//	}
+//
+//	SaveLangConfigCurrentDir(e->Name);
+//
+//	Copy(&current_lang, e, sizeof(LANGLIST));
+//	Copy(&current_os_lang, os_lang, sizeof(LANGLIST));
+//
+//	current_lang.LangList = current_lang.LcidList = NULL;
+//	current_os_lang.LangList = current_os_lang.LcidList = NULL;
 
 	// Read the corresponding string table
-	Format(table_name, sizeof(table_name), "|strtable_%s.stb", current_lang.Name);
+//	Format(table_name, sizeof(table_name), "|strtable_%s.stb", current_lang.Name);
+	Format(table_name, sizeof(table_name), "|strtable_en.stb");
 	if (LoadTable(table_name) == false)
 	{
-		goto LABEL_FATAL_ERROR;
+//		goto LABEL_FATAL_ERROR;
+		Alert("Fatal Error: The file \"hamcore.se2\" is missing or broken.\r\nPlease check hamcore.se2.\r\n\r\n(First, reboot the computer. If this problem occurs again, please reinstall VPN software files.)", NULL);
+		exit(-1);
 	}
 
-	FreeLangList(o);
+//	FreeLangList(o);
 }
 
-// Get the language of the current OS
-void GetCurrentOsLang(LANGLIST *e)
-{
-	// Validate arguments
-	if (e == NULL)
-	{
-		return;
-	}
-
-	Copy(e, &current_os_lang, sizeof(LANGLIST));
-}
-
-// Get the language ID of the current OS
-UINT GetCurrentOsLangId()
-{
-	LANGLIST e;
-
-	Zero(&e, sizeof(e));
-
-	GetCurrentOsLang(&e);
-
-	return e.Id;
-}
-
-// Get the current language
-void GetCurrentLang(LANGLIST *e)
-{
-	// Validate arguments
-	if (e == NULL)
-	{
-		return;
-	}
-
-	Copy(e, &current_lang, sizeof(LANGLIST));
-}
-
-// Get the current language ID
-UINT GetCurrentLangId()
-{
-	LANGLIST e;
-
-	Zero(&e, sizeof(e));
-
-	GetCurrentLang(&e);
-
-	return e.Id;
-}
-
-// Write to the lang.config file in the current directory
-bool SaveLangConfigCurrentDir(char *str)
-{
-	// Validate arguments
-	if (str == NULL)
-	{
-		return false;
-	}
-
-	return SaveLangConfig(LANG_CONFIG_FILENAME, str);
-}
-
-// Write to the lang.config file
-bool SaveLangConfig(wchar_t *filename, char *str)
-{
-	BUF *b;
-	LIST *o;
-	UINT i;
-	bool ret;
-	// Validate arguments
-	if (filename == NULL)
-	{
-		return false;
-	}
-
-	// Read the template
-	b = ReadDump(LANG_CONFIG_TEMPLETE);
-	if (b == NULL)
-	{
-		return false;
-	}
-
-	SeekBuf(b, b->Size, 0);
-
-	o = LoadLangList();
-	if (o != NULL)
-	{
-		wchar_t tmp[MAX_SIZE];
-
-		AppendBufStr(b, "# Available Language IDs are:\r\n");
-
-		for (i = 0;i < LIST_NUM(o);i++)
-		{
-			LANGLIST *e = LIST_DATA(o, i);
-
-			UniFormat(tmp, sizeof(tmp), L"#  %S: %s (%s)\r\n",
-				e->Name, e->TitleEnglish, e->TitleLocal);
-
-			AppendBufUtf8(b, tmp);
-		}
-
-		AppendBufStr(b, "\r\n\r\n# Specify a Language ID here.\r\n");
-		AppendBufStr(b, str);
-		AppendBufStr(b, "\r\n\r\n");
-
-		FreeLangList(o);
-	}
-
-	ret = DumpBufWIfNecessary(b, filename);
-
-	FreeBuf(b);
-
-	return ret;
-}
-
-// Read the lang.config file in the current directory
-bool LoadLangConfigCurrentDir(char *str, UINT str_size)
-{
-	// Validate arguments
-	if (str == NULL)
-	{
-		return false;
-	}
-
-	return LoadLangConfig(LANG_CONFIG_FILENAME, str, str_size);
-}
-
-// Read the lang.config file
-bool LoadLangConfig(wchar_t *filename, char *str, UINT str_size)
-{
-	BUF *b;
-	bool ret = false;
-	// Validate arguments
-	if (filename == NULL || str == NULL)
-	{
-		return false;
-	}
-
-	b = ReadDumpW(filename);
-	if (b == NULL)
-	{
-		return false;
-	}
-
-	while (true)
-	{
-		char *line = CfgReadNextLine(b);
-
-		if (line == NULL)
-		{
-			break;
-		}
-
-		Trim(line);
-
-		if (IsEmptyStr(line) == false)
-		{
-			if (StartWith(line, "#") == false && StartWith(line, "//") == false && StartWith(line, ";") == false &&
-				InStr(line, "#") == false)
-			{
-				StrCpy(str, str_size, line);
-				ret = true;
-			}
-		}
-
-		Free(line);
-	}
-
-	FreeBuf(b);
-
-	return ret;
-}
-
-// Choose the language from the ID
-LANGLIST *GetLangById(LIST *o, UINT id)
-{
-	UINT i;
-	// Validate arguments
-	if (o == NULL)
-	{
-		return NULL;
-	}
-
-	for (i = 0;i < LIST_NUM(o);i++)
-	{
-		LANGLIST *e = LIST_DATA(o, i);
-
-		if (e->Id == id)
-		{
-			return e;
-		}
-	}
-
-	return NULL;
-}
-
-// Choice the best language for the current environment
-LANGLIST *GetBestLangForCurrentEnvironment(LIST *o)
-{
-	LANGLIST *ret = NULL;
-	// Validate arguments
-	if (o == NULL)
-	{
-		return NULL;
-	}
-
-#ifdef	OS_WIN32
-	ret = GetBestLangByLcid(o, MsGetUserLocaleId());
-#else	// OS_WIN32
-	if (true)
-	{
-		char lang[MAX_SIZE];
-
-		if (GetEnv("LANG", lang, sizeof(lang)))
-		{
-			ret = GetBestLangByLangStr(o, lang);
-		}
-		else
-		{
-			ret = GetBestLangByLangStr(o, "C");
-		}
-	}
-#endif	// OS_WIN32
-
-	return ret;
-}
-
-// Search for the best language from LANG string of UNIX
-LANGLIST *GetBestLangByLangStr(LIST *o, char *str)
-{
-	UINT i;
-	LANGLIST *ret;
-	// Validate arguments
-	if (o == NULL)
-	{
-		return NULL;
-	}
-
-	for (i = 0;i < LIST_NUM(o);i++)
-	{
-		LANGLIST *e = LIST_DATA(o, i);
-		UINT j;
-
-		for (j = 0;j < LIST_NUM(e->LangList);j++)
-		{
-			char *v = LIST_DATA(e->LangList, j);
-
-			if (StrCmpi(v, str) == 0)
-			{
-				return e;
-			}
-		}
-	}
-
-	for (i = 0;i < LIST_NUM(o);i++)
-	{
-		LANGLIST *e = LIST_DATA(o, i);
-		UINT j;
-
-		for (j = 0;j < LIST_NUM(e->LangList);j++)
-		{
-			char *v = LIST_DATA(e->LangList, j);
-
-			if (StartWith(str, v) || StartWith(v, str))
-			{
-				return e;
-			}
-		}
-	}
-
-	ret = GetBestLangByName(o, "en");
-
-	return ret;
-}
-
-// Search for the best language from LCID
-LANGLIST *GetBestLangByLcid(LIST *o, UINT lcid)
-{
-	LANGLIST *ret;
-	UINT i;
-	// Validate arguments
-	if (o == NULL)
-	{
-		return NULL;
-	}
-
-	for (i = 0;i < LIST_NUM(o);i++)
-	{
-		LANGLIST *e = LIST_DATA(o, i);
-
-		if (IsIntInList(e->LcidList, lcid))
-		{
-			return e;
-		}
-	}
-
-	ret = GetBestLangByName(o, "en");
-
-	return ret;
-}
-
-// Search for the best language from the name
-LANGLIST *GetBestLangByName(LIST *o, char *name)
-{
-	UINT i;
-	LANGLIST *ret = NULL;
-	// Validate arguments
-	if (o == NULL)
-	{
-		return NULL;
-	}
-
-	for (i = 0;i < LIST_NUM(o);i++)
-	{
-		LANGLIST *e = LIST_DATA(o, i);
-
-		if (StrCmpi(e->Name, name) == 0)
-		{
-			ret = e;
-			break;
-		}
-	}
-
-	if (ret != NULL)
-	{
-		return ret;
-	}
-
-	for (i = 0;i < LIST_NUM(o);i++)
-	{
-		LANGLIST *e = LIST_DATA(o, i);
-
-		if (StartWith(e->Name, name) || StartWith(name, e->Name))
-		{
-			ret = e;
-			break;
-		}
-	}
-
-	if (ret != NULL)
-	{
-		return ret;
-	}
-
-	return ret;
-}
-
-// Release the language list
-void FreeLangList(LIST *o)
-{
-	UINT i;
-	// Validate arguments
-	if (o == NULL)
-	{
-		return;
-	}
-
-	for (i = 0;i < LIST_NUM(o);i++)
-	{
-		LANGLIST *e = LIST_DATA(o, i);
-
-		FreeStrList(e->LangList);
-		ReleaseIntList(e->LcidList);
-
-		Free(e);
-	}
-
-	ReleaseList(o);
-}
-
-// Read the language list
-LIST *LoadLangList()
-{
-	LIST *o = NewListFast(NULL);
-	char *filename = LANGLIST_FILENAME;
-	BUF *b;
-
-	b = ReadDump(filename);
-	if (b == NULL)
-	{
-		return NULL;
-	}
-
-	while (true)
-	{
-		char *line = CfgReadNextLine(b);
-
-		if (line == NULL)
-		{
-			break;
-		}
-
-		Trim(line);
-
-		if (IsEmptyStr(line) == false && StartWith(line, "#") == false)
-		{
-			TOKEN_LIST *t = ParseToken(line, "\t ");
-			if (t != NULL)
-			{
-				if (t->NumTokens == 6)
-				{
-					LANGLIST *e = ZeroMalloc(sizeof(LANGLIST));
-					TOKEN_LIST *t2;
-
-					e->Id = ToInt(t->Token[0]);
-					StrCpy(e->Name, sizeof(e->Name), t->Token[1]);
-					Utf8ToUni(e->TitleEnglish, sizeof(e->TitleEnglish), t->Token[2], StrLen(t->Token[2]));
-					Utf8ToUni(e->TitleLocal, sizeof(e->TitleLocal), t->Token[3], StrLen(t->Token[3]));
-
-					UniReplaceStrEx(e->TitleEnglish, sizeof(e->TitleEnglish), e->TitleEnglish,
-						L"_", L" ", true);
-
-					UniReplaceStrEx(e->TitleLocal, sizeof(e->TitleLocal), e->TitleLocal,
-						L"_", L" ", true);
-
-					e->LcidList = NewIntList(false);
-
-					t2 = ParseToken(t->Token[4], ",");
-					if (t2 != NULL)
-					{
-						UINT i;
-
-						for (i = 0;i < t2->NumTokens;i++)
-						{
-							UINT id = ToInt(t2->Token[i]);
-
-							AddIntDistinct(e->LcidList, id);
-						}
-
-						FreeToken(t2);
-					}
-
-					e->LangList = NewListFast(NULL);
-
-					t2 = ParseToken(t->Token[5], ",");
-					if (t2 != NULL)
-					{
-						UINT i;
-
-						for (i = 0;i < t2->NumTokens;i++)
-						{
-							Add(e->LangList, CopyStr(t2->Token[i]));
-						}
-
-						FreeToken(t2);
-					}
-
-					Add(o, e);
-				}
-
-				FreeToken(t);
-			}
-		}
-
-		Free(line);
-	}
-
-	FreeBuf(b);
-
-	return o;
-}
+//// Get the language of the current OS
+//void GetCurrentOsLang(LANGLIST *e)
+//{
+//	// Validate arguments
+//	if (e == NULL)
+//	{
+//		return;
+//	}
+//
+//	Copy(e, &current_os_lang, sizeof(LANGLIST));
+//}
+//
+//// Get the language ID of the current OS
+//UINT GetCurrentOsLangId()
+//{
+//	LANGLIST e;
+//
+//	Zero(&e, sizeof(e));
+//
+//	GetCurrentOsLang(&e);
+//
+//	return e.Id;
+//}
+//
+//// Get the current language
+//void GetCurrentLang(LANGLIST *e)
+//{
+//	// Validate arguments
+//	if (e == NULL)
+//	{
+//		return;
+//	}
+//
+//	Copy(e, &current_lang, sizeof(LANGLIST));
+//}
+//
+//// Get the current language ID
+//UINT GetCurrentLangId()
+//{
+//	LANGLIST e;
+//
+//	Zero(&e, sizeof(e));
+//
+//	GetCurrentLang(&e);
+//
+//	return e.Id;
+//}
+//
+//// Write to the lang.config file in the current directory
+//bool SaveLangConfigCurrentDir(char *str)
+//{
+//	// Validate arguments
+//	if (str == NULL)
+//	{
+//		return false;
+//	}
+//
+//	return SaveLangConfig(LANG_CONFIG_FILENAME, str);
+//}
+//
+//// Write to the lang.config file
+//bool SaveLangConfig(wchar_t *filename, char *str)
+//{
+//	BUF *b;
+//	LIST *o;
+//	UINT i;
+//	bool ret;
+//	// Validate arguments
+//	if (filename == NULL)
+//	{
+//		return false;
+//	}
+//
+//	// Read the template
+//	b = ReadDump(LANG_CONFIG_TEMPLETE);
+//	if (b == NULL)
+//	{
+//		return false;
+//	}
+//
+//	SeekBuf(b, b->Size, 0);
+//
+//	o = LoadLangList();
+//	if (o != NULL)
+//	{
+//		wchar_t tmp[MAX_SIZE];
+//
+//		AppendBufStr(b, "# Available Language IDs are:\r\n");
+//
+//		for (i = 0;i < LIST_NUM(o);i++)
+//		{
+//			LANGLIST *e = LIST_DATA(o, i);
+//
+//			UniFormat(tmp, sizeof(tmp), L"#  %S: %s (%s)\r\n",
+//				e->Name, e->TitleEnglish, e->TitleLocal);
+//
+//			AppendBufUtf8(b, tmp);
+//		}
+//
+//		AppendBufStr(b, "\r\n\r\n# Specify a Language ID here.\r\n");
+//		AppendBufStr(b, str);
+//		AppendBufStr(b, "\r\n\r\n");
+//
+//		FreeLangList(o);
+//	}
+//
+//	ret = DumpBufWIfNecessary(b, filename);
+//
+//	FreeBuf(b);
+//
+//	return ret;
+//}
+//
+//// Read the lang.config file in the current directory
+//bool LoadLangConfigCurrentDir(char *str, UINT str_size)
+//{
+//	// Validate arguments
+//	if (str == NULL)
+//	{
+//		return false;
+//	}
+//
+//	return LoadLangConfig(LANG_CONFIG_FILENAME, str, str_size);
+//}
+//
+//// Read the lang.config file
+//bool LoadLangConfig(wchar_t *filename, char *str, UINT str_size)
+//{
+//	BUF *b;
+//	bool ret = false;
+//	// Validate arguments
+//	if (filename == NULL || str == NULL)
+//	{
+//		return false;
+//	}
+//
+//	b = ReadDumpW(filename);
+//	if (b == NULL)
+//	{
+//		return false;
+//	}
+//
+//	while (true)
+//	{
+//		char *line = CfgReadNextLine(b);
+//
+//		if (line == NULL)
+//		{
+//			break;
+//		}
+//
+//		Trim(line);
+//
+//		if (IsEmptyStr(line) == false)
+//		{
+//			if (StartWith(line, "#") == false && StartWith(line, "//") == false && StartWith(line, ";") == false &&
+//				InStr(line, "#") == false)
+//			{
+//				StrCpy(str, str_size, line);
+//				ret = true;
+//			}
+//		}
+//
+//		Free(line);
+//	}
+//
+//	FreeBuf(b);
+//
+//	return ret;
+//}
+//
+//// Choose the language from the ID
+//LANGLIST *GetLangById(LIST *o, UINT id)
+//{
+//	UINT i;
+//	// Validate arguments
+//	if (o == NULL)
+//	{
+//		return NULL;
+//	}
+//
+//	for (i = 0;i < LIST_NUM(o);i++)
+//	{
+//		LANGLIST *e = LIST_DATA(o, i);
+//
+//		if (e->Id == id)
+//		{
+//			return e;
+//		}
+//	}
+//
+//	return NULL;
+//}
+//
+//// Choice the best language for the current environment
+//LANGLIST *GetBestLangForCurrentEnvironment(LIST *o)
+//{
+//	LANGLIST *ret = NULL;
+//	// Validate arguments
+//	if (o == NULL)
+//	{
+//		return NULL;
+//	}
+//
+//#ifdef	OS_WIN32
+//	ret = GetBestLangByLcid(o, MsGetUserLocaleId());
+//#else	// OS_WIN32
+//	if (true)
+//	{
+//		char lang[MAX_SIZE];
+//
+//		if (GetEnv("LANG", lang, sizeof(lang)))
+//		{
+//			ret = GetBestLangByLangStr(o, lang);
+//		}
+//		else
+//		{
+//			ret = GetBestLangByLangStr(o, "C");
+//		}
+//	}
+//#endif	// OS_WIN32
+//
+//	return ret;
+//}
+//
+//// Search for the best language from LANG string of UNIX
+//LANGLIST *GetBestLangByLangStr(LIST *o, char *str)
+//{
+//	UINT i;
+//	LANGLIST *ret;
+//	// Validate arguments
+//	if (o == NULL)
+//	{
+//		return NULL;
+//	}
+//
+//	for (i = 0;i < LIST_NUM(o);i++)
+//	{
+//		LANGLIST *e = LIST_DATA(o, i);
+//		UINT j;
+//
+//		for (j = 0;j < LIST_NUM(e->LangList);j++)
+//		{
+//			char *v = LIST_DATA(e->LangList, j);
+//
+//			if (StrCmpi(v, str) == 0)
+//			{
+//				return e;
+//			}
+//		}
+//	}
+//
+//	for (i = 0;i < LIST_NUM(o);i++)
+//	{
+//		LANGLIST *e = LIST_DATA(o, i);
+//		UINT j;
+//
+//		for (j = 0;j < LIST_NUM(e->LangList);j++)
+//		{
+//			char *v = LIST_DATA(e->LangList, j);
+//
+//			if (StartWith(str, v) || StartWith(v, str))
+//			{
+//				return e;
+//			}
+//		}
+//	}
+//
+//	ret = GetBestLangByName(o, "en");
+//
+//	return ret;
+//}
+//
+//// Search for the best language from LCID
+//LANGLIST *GetBestLangByLcid(LIST *o, UINT lcid)
+//{
+//	LANGLIST *ret;
+//	UINT i;
+//	// Validate arguments
+//	if (o == NULL)
+//	{
+//		return NULL;
+//	}
+//
+//	for (i = 0;i < LIST_NUM(o);i++)
+//	{
+//		LANGLIST *e = LIST_DATA(o, i);
+//
+//		if (IsIntInList(e->LcidList, lcid))
+//		{
+//			return e;
+//		}
+//	}
+//
+//	ret = GetBestLangByName(o, "en");
+//
+//	return ret;
+//}
+//
+//// Search for the best language from the name
+//LANGLIST *GetBestLangByName(LIST *o, char *name)
+//{
+//	UINT i;
+//	LANGLIST *ret = NULL;
+//	// Validate arguments
+//	if (o == NULL)
+//	{
+//		return NULL;
+//	}
+//
+//	for (i = 0;i < LIST_NUM(o);i++)
+//	{
+//		LANGLIST *e = LIST_DATA(o, i);
+//
+//		if (StrCmpi(e->Name, name) == 0)
+//		{
+//			ret = e;
+//			break;
+//		}
+//	}
+//
+//	if (ret != NULL)
+//	{
+//		return ret;
+//	}
+//
+//	for (i = 0;i < LIST_NUM(o);i++)
+//	{
+//		LANGLIST *e = LIST_DATA(o, i);
+//
+//		if (StartWith(e->Name, name) || StartWith(name, e->Name))
+//		{
+//			ret = e;
+//			break;
+//		}
+//	}
+//
+//	if (ret != NULL)
+//	{
+//		return ret;
+//	}
+//
+//	return ret;
+//}
+//
+//// Release the language list
+//void FreeLangList(LIST *o)
+//{
+//	UINT i;
+//	// Validate arguments
+//	if (o == NULL)
+//	{
+//		return;
+//	}
+//
+//	for (i = 0;i < LIST_NUM(o);i++)
+//	{
+//		LANGLIST *e = LIST_DATA(o, i);
+//
+//		FreeStrList(e->LangList);
+//		ReleaseIntList(e->LcidList);
+//
+//		Free(e);
+//	}
+//
+//	ReleaseList(o);
+//}
+//
+//// Read the language list
+//LIST *LoadLangList()
+//{
+//	LIST *o = NewListFast(NULL);
+//	char *filename = LANGLIST_FILENAME;
+//	BUF *b;
+//
+//	b = ReadDump(filename);
+//	if (b == NULL)
+//	{
+//		return NULL;
+//	}
+//
+//	while (true)
+//	{
+//		char *line = CfgReadNextLine(b);
+//
+//		if (line == NULL)
+//		{
+//			break;
+//		}
+//
+//		Trim(line);
+//
+//		if (IsEmptyStr(line) == false && StartWith(line, "#") == false)
+//		{
+//			TOKEN_LIST *t = ParseToken(line, "\t ");
+//			if (t != NULL)
+//			{
+//				if (t->NumTokens == 6)
+//				{
+//					LANGLIST *e = ZeroMalloc(sizeof(LANGLIST));
+//					TOKEN_LIST *t2;
+//
+//					e->Id = ToInt(t->Token[0]);
+//					StrCpy(e->Name, sizeof(e->Name), t->Token[1]);
+//					Utf8ToUni(e->TitleEnglish, sizeof(e->TitleEnglish), t->Token[2], StrLen(t->Token[2]));
+//					Utf8ToUni(e->TitleLocal, sizeof(e->TitleLocal), t->Token[3], StrLen(t->Token[3]));
+//
+//					UniReplaceStrEx(e->TitleEnglish, sizeof(e->TitleEnglish), e->TitleEnglish,
+//						L"_", L" ", true);
+//
+//					UniReplaceStrEx(e->TitleLocal, sizeof(e->TitleLocal), e->TitleLocal,
+//						L"_", L" ", true);
+//
+//					e->LcidList = NewIntList(false);
+//
+//					t2 = ParseToken(t->Token[4], ",");
+//					if (t2 != NULL)
+//					{
+//						UINT i;
+//
+//						for (i = 0;i < t2->NumTokens;i++)
+//						{
+//							UINT id = ToInt(t2->Token[i]);
+//
+//							AddIntDistinct(e->LcidList, id);
+//						}
+//
+//						FreeToken(t2);
+//					}
+//
+//					e->LangList = NewListFast(NULL);
+//
+//					t2 = ParseToken(t->Token[5], ",");
+//					if (t2 != NULL)
+//					{
+//						UINT i;
+//
+//						for (i = 0;i < t2->NumTokens;i++)
+//						{
+//							Add(e->LangList, CopyStr(t2->Token[i]));
+//						}
+//
+//						FreeToken(t2);
+//					}
+//
+//					Add(o, e);
+//				}
+//
+//				FreeToken(t);
+//			}
+//		}
+//
+//		Free(line);
+//	}
+//
+//	FreeBuf(b);
+//
+//	return o;
+//}
 
 // Get an error string in Unicode
 wchar_t *GetUniErrorStr(UINT err)

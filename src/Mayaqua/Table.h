@@ -116,14 +116,14 @@
 
 #define	UNICODE_CACHE_FILE		L".unicode_cache_%s.dat"
 
-#define	LANGLIST_FILENAME		"|languages.txt"
-#define	LANG_CONFIG_FILENAME	L"@lang.config"
-#define	LANG_CONFIG_TEMPLETE	"|lang.config"
-
-// Language constant
-#define SE_LANG_JAPANESE			0	// Japanese
-#define SE_LANG_ENGLISH				1	// English
-#define SE_LANG_CHINESE_ZH			2	// Simplified Chinese
+//#define	LANGLIST_FILENAME		"|languages.txt"
+//#define	LANG_CONFIG_FILENAME	L"@lang.config"
+//#define	LANG_CONFIG_TEMPLETE	"|lang.config"
+//
+//// Language constant
+//#define SE_LANG_JAPANESE			0	// Japanese
+//#define SE_LANG_ENGLISH				1	// English
+//#define SE_LANG_CHINESE_ZH			2	// Simplified Chinese
 
 
 // String table
@@ -151,7 +151,7 @@ typedef struct UNICODE_CACHE
 #define	_II(name)		(GetTableInt((char *)(name)))
 #define	_E(name)		(GetUniErrorStr((UINT)(name)))
 #define	_EA(name)		(GetErrorStr((UINT)(name)))
-#define _GETLANG()		(_II("LANG"))
+//#define _GETLANG()		(_II("LANG"))
 
 // Language list
 struct LANGLIST
@@ -186,25 +186,25 @@ void SaveUnicodeCache(wchar_t *strfilename, UINT strfilesize, UCHAR *hash);
 bool LoadUnicodeCache(wchar_t *strfilename, UINT strfilesize, UCHAR *hash);
 void InitTable();
 
-LIST *LoadLangList();
-void FreeLangList(LIST *o);
-
-LANGLIST *GetBestLangByName(LIST *o, char *name);
-LANGLIST *GetBestLangByLcid(LIST *o, UINT lcid);
-LANGLIST *GetBestLangByLangStr(LIST *o, char *str);
-LANGLIST *GetBestLangForCurrentEnvironment(LIST *o);
-LANGLIST *GetLangById(LIST *o, UINT id);
-
-bool LoadLangConfig(wchar_t *filename, char *str, UINT str_size);
-bool LoadLangConfigCurrentDir(char *str, UINT str_size);
-bool SaveLangConfig(wchar_t *filename, char *str);
-bool SaveLangConfigCurrentDir(char *str);
-
-void GetCurrentLang(LANGLIST *e);
-UINT GetCurrentLangId();
-
-void GetCurrentOsLang(LANGLIST *e);
-UINT GetCurrentOsLangId();
+//LIST *LoadLangList();
+//void FreeLangList(LIST *o);
+//
+//LANGLIST *GetBestLangByName(LIST *o, char *name);
+//LANGLIST *GetBestLangByLcid(LIST *o, UINT lcid);
+//LANGLIST *GetBestLangByLangStr(LIST *o, char *str);
+//LANGLIST *GetBestLangForCurrentEnvironment(LIST *o);
+//LANGLIST *GetLangById(LIST *o, UINT id);
+//
+//bool LoadLangConfig(wchar_t *filename, char *str, UINT str_size);
+//bool LoadLangConfigCurrentDir(char *str, UINT str_size);
+//bool SaveLangConfig(wchar_t *filename, char *str);
+//bool SaveLangConfigCurrentDir(char *str);
+//
+//void GetCurrentLang(LANGLIST *e);
+//UINT GetCurrentLangId();
+//
+//void GetCurrentOsLang(LANGLIST *e);
+//UINT GetCurrentOsLangId();
 
 #endif	// TABLE_H
 
