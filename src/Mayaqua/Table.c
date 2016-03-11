@@ -1180,204 +1180,204 @@ bool LoadTableFromBuf(BUF *b)
 	return true;
 }
 
-// Generate the Unicode string cache file name
-void GenerateUnicodeCacheFileName(wchar_t *name, UINT size, wchar_t *strfilename, UINT strfilesize, UCHAR *filehash)
-{
-	wchar_t tmp[MAX_SIZE];
-	wchar_t hashstr[64];
-	wchar_t hashtemp[MAX_SIZE];
-	wchar_t exe[MAX_SIZE];
-	UCHAR hash[SHA1_SIZE];
-	// Validate arguments
-	if (name == NULL || strfilename == NULL || filehash == NULL)
-	{
-		return;
-	}
-
-	GetExeDirW(exe, sizeof(exe));
-	UniStrCpy(hashtemp, sizeof(hashtemp), strfilename);
-	BinToStrW(tmp, sizeof(tmp), filehash, MD5_SIZE);
-	UniStrCat(hashtemp, sizeof(hashtemp), tmp);
-	UniStrCat(hashtemp, sizeof(hashtemp), exe);
-	UniStrLower(hashtemp);
-
-	Hash(hash, hashtemp, UniStrLen(hashtemp) * sizeof(wchar_t), true);
-	BinToStrW(hashstr, sizeof(hashstr), hash, 4);
-	UniFormat(tmp, sizeof(tmp), UNICODE_CACHE_FILE, hashstr);
-	UniStrLower(tmp);
-
-#ifndef	OS_WIN32
-	UniStrCpy(exe, sizeof(exe), L"/tmp");
-#else	// OS_WIN32
-	StrToUni(exe, sizeof(exe), MsGetTempDir());
-#endif	// OS_WIN32
-
-	UniFormat(name, size, L"%s/%s", exe, tmp);
-	NormalizePathW(name, size, name);
-}
-
-// Save the Unicode cache
-void SaveUnicodeCache(wchar_t *strfilename, UINT strfilesize, UCHAR *hash)
-{
-	UNICODE_CACHE c;
-	BUF *b;
-	UINT i;
-	IO *io;
-	wchar_t name[MAX_PATH];
-	UCHAR binhash[MD5_SIZE];
-	// Validate arguments
-	if (strfilename == NULL || hash == NULL)
-	{
-		return;
-	}
-
-	Zero(&c, sizeof(c));
-	UniToStr(c.StrFileName, sizeof(c.StrFileName), strfilename);
-	c.StrFileSize = strfilesize;
-	GetMachineName(c.MachineName, sizeof(c.MachineName));
-	c.OsType = GetOsInfo()->OsType;
-	Copy(c.hash, hash, MD5_SIZE);
-
-#ifdef	OS_UNIX
-	GetCurrentCharSet(c.CharSet, sizeof(c.CharSet));
-#else	// OS_UNIX
-	{
-		UINT id = MsGetThreadLocale();
-		Copy(c.CharSet, &id, sizeof(id));
-	}
-#endif	// OS_UNIX
-
-	b = NewBuf();
-	WriteBuf(b, &c, sizeof(c));
-
-	WriteBufInt(b, LIST_NUM(TableList));
-	for (i = 0;i < LIST_NUM(TableList);i++)
-	{
-		TABLE *t = LIST_DATA(TableList, i);
-		WriteBufInt(b, StrLen(t->name));
-		WriteBuf(b, t->name, StrLen(t->name));
-		WriteBufInt(b, StrLen(t->str));
-		WriteBuf(b, t->str, StrLen(t->str));
-		WriteBufInt(b, UniStrLen(t->unistr));
-		WriteBuf(b, t->unistr, UniStrLen(t->unistr) * sizeof(wchar_t));
-	}
-
-	Hash(binhash, b->Buf, b->Size, false);
-	WriteBuf(b, binhash, MD5_SIZE);
-
-	GenerateUnicodeCacheFileName(name, sizeof(name), strfilename, strfilesize, hash);
-
-	io = FileCreateW(name);
-	if (io != NULL)
-	{
-		SeekBuf(b, 0, 0);
-		BufToFile(io, b);
-		FileClose(io);
-	}
-
-	FreeBuf(b);
-}
-
-// Reading the Unicode cache
-bool LoadUnicodeCache(wchar_t *strfilename, UINT strfilesize, UCHAR *hash)
-{
-	UNICODE_CACHE c, t;
-	BUF *b;
-	UINT i, num;
-	IO *io;
-	wchar_t name[MAX_PATH];
-	UCHAR binhash[MD5_SIZE];
-	UCHAR binhash_2[MD5_SIZE];
-	// Validate arguments
-	if (strfilename == NULL || hash == NULL)
-	{
-		return false;
-	}
-
-	GenerateUnicodeCacheFileName(name, sizeof(name), strfilename, strfilesize, hash);
-
-	io = FileOpenW(name, false);
-	if (io == NULL)
-	{
-		return false;
-	}
-
-	b = FileToBuf(io);
-	if (b == NULL)
-	{
-		FileClose(io);
-		return false;
-	}
-
-	SeekBuf(b, 0, 0);
-	FileClose(io);
-
-	Hash(binhash, b->Buf, b->Size >= MD5_SIZE ? (b->Size - MD5_SIZE) : 0, false);
-	Copy(binhash_2, ((UCHAR *)b->Buf) + (b->Size >= MD5_SIZE ? (b->Size - MD5_SIZE) : 0), MD5_SIZE);
-	if (Cmp(binhash, binhash_2, MD5_SIZE) != 0)
-	{
-		FreeBuf(b);
-		return false;
-	}
-
-	Zero(&c, sizeof(c));
-	UniToStr(c.StrFileName, sizeof(c.StrFileName), strfilename);
-	c.StrFileSize = strfilesize;
-	DisableNetworkNameCache();
-	GetMachineName(c.MachineName, sizeof(c.MachineName));
-	EnableNetworkNameCache();
-	c.OsType = GetOsInfo()->OsType;
-	Copy(c.hash, hash, MD5_SIZE);
-
-#ifdef	OS_UNIX
-	GetCurrentCharSet(c.CharSet, sizeof(c.CharSet));
-#else	// OS_UNIX
-	{
-		UINT id = MsGetThreadLocale();
-		Copy(c.CharSet, &id, sizeof(id));
-	}
-#endif	// OS_UNIX
-
-	Zero(&t, sizeof(t));
-	ReadBuf(b, &t, sizeof(t));
-
-	if (Cmp(&c, &t, sizeof(UNICODE_CACHE)) != 0)
-	{
-		FreeBuf(b);
-		return false;
-	}
-
-	num = ReadBufInt(b);
-
-	FreeTable();
-	TableList = NewList(CmpTableName);
-
-	for (i = 0;i < num;i++)
-	{
-		UINT len;
-		TABLE *t = ZeroMalloc(sizeof(TABLE));
-
-		len = ReadBufInt(b);
-		t->name = ZeroMalloc(len + 1);
-		ReadBuf(b, t->name, len);
-
-		len = ReadBufInt(b);
-		t->str = ZeroMalloc(len + 1);
-		ReadBuf(b, t->str, len);
-
-		len = ReadBufInt(b);
-		t->unistr = ZeroMalloc((len + 1) * sizeof(wchar_t));
-		ReadBuf(b, t->unistr, len * sizeof(wchar_t));
-
-		Add(TableList, t);
-	}
-
-	FreeBuf(b);
-
-	Sort(TableList);
-
-	return true;
-}
+//// Generate the Unicode string cache file name
+//void GenerateUnicodeCacheFileName(wchar_t *name, UINT size, wchar_t *strfilename, UINT strfilesize, UCHAR *filehash)
+//{
+//	wchar_t tmp[MAX_SIZE];
+//	wchar_t hashstr[64];
+//	wchar_t hashtemp[MAX_SIZE];
+//	wchar_t exe[MAX_SIZE];
+//	UCHAR hash[SHA1_SIZE];
+//	// Validate arguments
+//	if (name == NULL || strfilename == NULL || filehash == NULL)
+//	{
+//		return;
+//	}
+//
+//	GetExeDirW(exe, sizeof(exe));
+//	UniStrCpy(hashtemp, sizeof(hashtemp), strfilename);
+//	BinToStrW(tmp, sizeof(tmp), filehash, MD5_SIZE);
+//	UniStrCat(hashtemp, sizeof(hashtemp), tmp);
+//	UniStrCat(hashtemp, sizeof(hashtemp), exe);
+//	UniStrLower(hashtemp);
+//
+//	Hash(hash, hashtemp, UniStrLen(hashtemp) * sizeof(wchar_t), true);
+//	BinToStrW(hashstr, sizeof(hashstr), hash, 4);
+//	UniFormat(tmp, sizeof(tmp), UNICODE_CACHE_FILE, hashstr);
+//	UniStrLower(tmp);
+//
+//#ifndef	OS_WIN32
+//	UniStrCpy(exe, sizeof(exe), L"/tmp");
+//#else	// OS_WIN32
+//	StrToUni(exe, sizeof(exe), MsGetTempDir());
+//#endif	// OS_WIN32
+//
+//	UniFormat(name, size, L"%s/%s", exe, tmp);
+//	NormalizePathW(name, size, name);
+//}
+//
+//// Save the Unicode cache
+//void SaveUnicodeCache(wchar_t *strfilename, UINT strfilesize, UCHAR *hash)
+//{
+//	UNICODE_CACHE c;
+//	BUF *b;
+//	UINT i;
+//	IO *io;
+//	wchar_t name[MAX_PATH];
+//	UCHAR binhash[MD5_SIZE];
+//	// Validate arguments
+//	if (strfilename == NULL || hash == NULL)
+//	{
+//		return;
+//	}
+//
+//	Zero(&c, sizeof(c));
+//	UniToStr(c.StrFileName, sizeof(c.StrFileName), strfilename);
+//	c.StrFileSize = strfilesize;
+//	GetMachineName(c.MachineName, sizeof(c.MachineName));
+//	c.OsType = GetOsInfo()->OsType;
+//	Copy(c.hash, hash, MD5_SIZE);
+//
+//#ifdef	OS_UNIX
+//	GetCurrentCharSet(c.CharSet, sizeof(c.CharSet));
+//#else	// OS_UNIX
+//	{
+//		UINT id = MsGetThreadLocale();
+//		Copy(c.CharSet, &id, sizeof(id));
+//	}
+//#endif	// OS_UNIX
+//
+//	b = NewBuf();
+//	WriteBuf(b, &c, sizeof(c));
+//
+//	WriteBufInt(b, LIST_NUM(TableList));
+//	for (i = 0;i < LIST_NUM(TableList);i++)
+//	{
+//		TABLE *t = LIST_DATA(TableList, i);
+//		WriteBufInt(b, StrLen(t->name));
+//		WriteBuf(b, t->name, StrLen(t->name));
+//		WriteBufInt(b, StrLen(t->str));
+//		WriteBuf(b, t->str, StrLen(t->str));
+//		WriteBufInt(b, UniStrLen(t->unistr));
+//		WriteBuf(b, t->unistr, UniStrLen(t->unistr) * sizeof(wchar_t));
+//	}
+//
+//	Hash(binhash, b->Buf, b->Size, false);
+//	WriteBuf(b, binhash, MD5_SIZE);
+//
+//	GenerateUnicodeCacheFileName(name, sizeof(name), strfilename, strfilesize, hash);
+//
+//	io = FileCreateW(name);
+//	if (io != NULL)
+//	{
+//		SeekBuf(b, 0, 0);
+//		BufToFile(io, b);
+//		FileClose(io);
+//	}
+//
+//	FreeBuf(b);
+//}
+//
+//// Reading the Unicode cache
+//bool LoadUnicodeCache(wchar_t *strfilename, UINT strfilesize, UCHAR *hash)
+//{
+//	UNICODE_CACHE c, t;
+//	BUF *b;
+//	UINT i, num;
+//	IO *io;
+//	wchar_t name[MAX_PATH];
+//	UCHAR binhash[MD5_SIZE];
+//	UCHAR binhash_2[MD5_SIZE];
+//	// Validate arguments
+//	if (strfilename == NULL || hash == NULL)
+//	{
+//		return false;
+//	}
+//
+//	GenerateUnicodeCacheFileName(name, sizeof(name), strfilename, strfilesize, hash);
+//
+//	io = FileOpenW(name, false);
+//	if (io == NULL)
+//	{
+//		return false;
+//	}
+//
+//	b = FileToBuf(io);
+//	if (b == NULL)
+//	{
+//		FileClose(io);
+//		return false;
+//	}
+//
+//	SeekBuf(b, 0, 0);
+//	FileClose(io);
+//
+//	Hash(binhash, b->Buf, b->Size >= MD5_SIZE ? (b->Size - MD5_SIZE) : 0, false);
+//	Copy(binhash_2, ((UCHAR *)b->Buf) + (b->Size >= MD5_SIZE ? (b->Size - MD5_SIZE) : 0), MD5_SIZE);
+//	if (Cmp(binhash, binhash_2, MD5_SIZE) != 0)
+//	{
+//		FreeBuf(b);
+//		return false;
+//	}
+//
+//	Zero(&c, sizeof(c));
+//	UniToStr(c.StrFileName, sizeof(c.StrFileName), strfilename);
+//	c.StrFileSize = strfilesize;
+//	DisableNetworkNameCache();
+//	GetMachineName(c.MachineName, sizeof(c.MachineName));
+//	EnableNetworkNameCache();
+//	c.OsType = GetOsInfo()->OsType;
+//	Copy(c.hash, hash, MD5_SIZE);
+//
+//#ifdef	OS_UNIX
+//	GetCurrentCharSet(c.CharSet, sizeof(c.CharSet));
+//#else	// OS_UNIX
+//	{
+//		UINT id = MsGetThreadLocale();
+//		Copy(c.CharSet, &id, sizeof(id));
+//	}
+//#endif	// OS_UNIX
+//
+//	Zero(&t, sizeof(t));
+//	ReadBuf(b, &t, sizeof(t));
+//
+//	if (Cmp(&c, &t, sizeof(UNICODE_CACHE)) != 0)
+//	{
+//		FreeBuf(b);
+//		return false;
+//	}
+//
+//	num = ReadBufInt(b);
+//
+//	FreeTable();
+//	TableList = NewList(CmpTableName);
+//
+//	for (i = 0;i < num;i++)
+//	{
+//		UINT len;
+//		TABLE *t = ZeroMalloc(sizeof(TABLE));
+//
+//		len = ReadBufInt(b);
+//		t->name = ZeroMalloc(len + 1);
+//		ReadBuf(b, t->name, len);
+//
+//		len = ReadBufInt(b);
+//		t->str = ZeroMalloc(len + 1);
+//		ReadBuf(b, t->str, len);
+//
+//		len = ReadBufInt(b);
+//		t->unistr = ZeroMalloc((len + 1) * sizeof(wchar_t));
+//		ReadBuf(b, t->unistr, len * sizeof(wchar_t));
+//
+//		Add(TableList, t);
+//	}
+//
+//	FreeBuf(b);
+//
+//	Sort(TableList);
+//
+//	return true;
+//}
 
 // Read the string table
 bool LoadTableMain(wchar_t *filename)
@@ -1417,22 +1417,22 @@ bool LoadTableMain(wchar_t *filename)
 
 	Hash(hash, b->Buf, b->Size, false);
 
-	if (LoadUnicodeCache(filename, b->Size, hash) == false)
-	{
+//	if (LoadUnicodeCache(filename, b->Size, hash) == false)
+//	{
 		if (LoadTableFromBuf(b) == false)
 		{
 			FreeBuf(b);
 			return false;
 		}
 
-		SaveUnicodeCache(filename, b->Size, hash);
-
-		//Debug("Unicode Source: strtable.stb\n");
-	}
-	else
-	{
-		//Debug("Unicode Source: unicode_cache\n");
-	}
+//		SaveUnicodeCache(filename, b->Size, hash);
+//
+//		//Debug("Unicode Source: strtable.stb\n");
+//	}
+//	else
+//	{
+//		//Debug("Unicode Source: unicode_cache\n");
+//	}
 
 	FreeBuf(b);
 

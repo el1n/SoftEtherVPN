@@ -114,8 +114,8 @@
 #ifndef	TABLE_H
 #define	TABLE_H
 
-#define	UNICODE_CACHE_FILE		L".unicode_cache_%s.dat"
-
+//#define	UNICODE_CACHE_FILE		L".unicode_cache_%s.dat"
+//
 //#define	LANGLIST_FILENAME		"|languages.txt"
 //#define	LANG_CONFIG_FILENAME	L"@lang.config"
 //#define	LANG_CONFIG_TEMPLETE	"|lang.config"
@@ -134,16 +134,16 @@ struct TABLE
 	wchar_t *unistr;
 };
 
-// Unicode cache structure
-typedef struct UNICODE_CACHE
-{
-	char StrFileName[256];	// String file name
-	UINT StrFileSize;		// String file size
-	char MachineName[256];	// Machine name
-	UINT OsType;			// OS type
-	UCHAR hash[MD5_SIZE];	// Hash
-	UCHAR CharSet[64];		// Type of character code
-} UNICODE_CACHE;
+//// Unicode cache structure
+//typedef struct UNICODE_CACHE
+//{
+//	char StrFileName[256];	// String file name
+//	UINT StrFileSize;		// String file size
+//	char MachineName[256];	// Machine name
+//	UINT OsType;			// OS type
+//	UCHAR hash[MD5_SIZE];	// Hash
+//	UCHAR CharSet[64];		// Type of character code
+//} UNICODE_CACHE;
 
 // Macro
 #define	_SS(name)		(GetTableStr((char *)(name)))
@@ -181,9 +181,9 @@ wchar_t *GetTableUniStr(char *name);
 char *GetErrorStr(UINT err);
 wchar_t *GetUniErrorStr(UINT err);
 UINT GetTableInt(char *name);
-void GenerateUnicodeCacheFileName(wchar_t *name, UINT size, wchar_t *strfilename, UINT strfilesize, UCHAR *filehash);
-void SaveUnicodeCache(wchar_t *strfilename, UINT strfilesize, UCHAR *hash);
-bool LoadUnicodeCache(wchar_t *strfilename, UINT strfilesize, UCHAR *hash);
+//void GenerateUnicodeCacheFileName(wchar_t *name, UINT size, wchar_t *strfilename, UINT strfilesize, UCHAR *filehash);
+//void SaveUnicodeCache(wchar_t *strfilename, UINT strfilesize, UCHAR *hash);
+//bool LoadUnicodeCache(wchar_t *strfilename, UINT strfilesize, UCHAR *hash);
 void InitTable();
 
 //LIST *LoadLangList();
