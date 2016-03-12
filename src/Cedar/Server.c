@@ -3336,7 +3336,7 @@ FOLDER *SiWriteConfigurationToCfg(SERVER *s)
 
 //	SiGetCurrentRegion(s->Cedar, region, sizeof(region));
 
-	CfgAddStr(root, "Region", region);
+//	CfgAddStr(root, "Region", region);
 
 	CfgAddInt(root, "ConfigRevision", s->ConfigRevision);
 
