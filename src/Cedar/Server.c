@@ -11036,7 +11036,7 @@ SERVER *SiNewServerEx(bool bridge, bool in_client_inner_server, bool relay_serve
 
 	SiInitDeadLockCheck(s);
 
-	//SiUpdateCurrentRegion(s->Cedar, "", true);
+//	SiUpdateCurrentRegion(s->Cedar, "", true);
 
 	return s;
 }
