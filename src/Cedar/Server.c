@@ -3336,7 +3336,7 @@ FOLDER *SiWriteConfigurationToCfg(SERVER *s)
 
 //	SiGetCurrentRegion(s->Cedar, region, sizeof(region));
 
-	CfgAddStr(root, "Region", region);
+//	CfgAddStr(root, "Region", region);
 
 	CfgAddInt(root, "ConfigRevision", s->ConfigRevision);
 
@@ -11036,7 +11036,7 @@ SERVER *SiNewServerEx(bool bridge, bool in_client_inner_server, bool relay_serve
 
 	SiInitDeadLockCheck(s);
 
-	//SiUpdateCurrentRegion(s->Cedar, "", true);
+//	SiUpdateCurrentRegion(s->Cedar, "", true);
 
 	return s;
 }
