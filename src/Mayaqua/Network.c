@@ -12904,8 +12904,7 @@ bool AddChainSslCert(struct ssl_ctx_st *ctx, X *x)
 // Start a TCP-SSL communication
 bool StartSSL(SOCK *sock, X *x, K *priv)
 {
-//	return StartSSLEx(sock, x, priv, false, 0, NULL);
-	return StartSSLEx(sock, x, priv, true, 0, NULL);
+	return StartSSLEx(sock, x, priv, false, 0, NULL);
 }
 bool StartSSLEx(SOCK *sock, X *x, K *priv, bool client_tls, UINT ssl_timeout, char *sni_hostname)
 {
