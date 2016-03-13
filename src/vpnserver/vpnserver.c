@@ -176,13 +176,13 @@ int main(int argc, char *argv[])
 	int r;
 
 	if(strcmp(xn,"vpnserver") == 0)
-		r = vpns_main(argc,argv);
+		r = vpnserver_main(argc,argv);
 	else if(strcmp(xn,"vpnclient") == 0)
-		r = vpnc_main(argc,argv);
+		r = vpncsvc_main(argc,argv);
 	else if(strcmp(xn,"vpnbridge") == 0)
-		r = vpnb_main(argc,argv);
+		r = vpnbridge_main(argc,argv);
 	else if(strcmp(xn,"vpncmd") == 0)
-		r = vpnm_main(argc,argv);
+		r = vpncmd_main(argc,argv);
 	else
 		r = 1;
 

@@ -57,7 +57,7 @@ HAMCORE_FILES=src/bin/hamcore/authors.txt src/bin/hamcore/backup_dir_readme.txt 
 # Build Action
 default:	build
 
-build:	$(OBJECTS_MAYAQUA) $(OBJECTS_CEDAR) bin/vpnserver
+build:	$(OBJECTS_MAYAQUA) $(OBJECTS_CEDAR) bin/vpnserver/vpnserver
 
 # Mayaqua Kernel Code
 tmp/objs/Mayaqua/Cfg.o: src/Mayaqua/Cfg.c $(HEADERS_MAYAQUA)
