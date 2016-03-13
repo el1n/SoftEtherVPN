@@ -1,0 +1,10 @@
+#!/bin/sh /etc/rc.common
+START=60
+
+start(){
+	/usr/bin/env LANG=en_US.UTF-8 /usr/bin/vpnclient start
+}
+
+stop(){
+	/usr/bin/env LANG=en_US.UTF-8 /usr/bin/vpnclient stop
+}
