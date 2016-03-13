@@ -12904,7 +12904,8 @@ bool AddChainSslCert(struct ssl_ctx_st *ctx, X *x)
 // Start a TCP-SSL communication
 bool StartSSL(SOCK *sock, X *x, K *priv)
 {
-	return StartSSLEx(sock, x, priv, false, 0, NULL);
+//	return StartSSLEx(sock, x, priv, false, 0, NULL);
+	return StartSSLEx(sock, x, priv, true, 0, NULL);
 }
 bool StartSSLEx(SOCK *sock, X *x, K *priv, bool client_tls, UINT ssl_timeout, char *sni_hostname)
 {
@@ -12966,14 +12967,14 @@ bool StartSSLEx(SOCK *sock, X *x, K *priv, bool client_tls, UINT ssl_timeout, ch
 	{
 		if (sock->ServerMode)
 		{
-			if (sock->AcceptOnlyTls == false)
-			{
-				SSL_CTX_set_ssl_version(ssl_ctx, SSLv23_method());
-			}
-			else
-			{
+//			if (sock->AcceptOnlyTls == false)
+//			{
+//				SSL_CTX_set_ssl_version(ssl_ctx, SSLv23_method());
+//			}
+//			else
+//			{
 				SSL_CTX_set_ssl_version(ssl_ctx, TLSv1_method());
-			}
+//			}
 
 			Unlock(openssl_lock);
 			AddChainSslCertOnDirectory(ssl_ctx);
@@ -12981,20 +12982,21 @@ bool StartSSLEx(SOCK *sock, X *x, K *priv, bool client_tls, UINT ssl_timeout, ch
 		}
 		else
 		{
-			if (client_tls == false)
-			{
-				SSL_CTX_set_ssl_version(ssl_ctx, SSLv3_method());
-			}
-			else
-			{
+//			if (client_tls == false)
+//			{
+//				SSL_CTX_set_ssl_version(ssl_ctx, SSLv3_method());
+//			}
+//			else
+//			{
 				SSL_CTX_set_ssl_version(ssl_ctx, TLSv1_client_method());
-			}
+//			}
 		}
 		sock->ssl = SSL_new(ssl_ctx);
 		SSL_set_fd(sock->ssl, (int)sock->socket);
 
 #ifdef	SSL_CTRL_SET_TLSEXT_HOSTNAME
-		if (sock->ServerMode == false && client_tls)
+//		if (sock->ServerMode == false && client_tls)
+		if (sock->ServerMode == false)
 		{
 			if (IsEmptyStr(sni_hostname) == false)
 			{
