@@ -609,7 +609,8 @@ SOCK *WpcSockConnectEx(WPC_CONNECT *param, UINT *error_code, UINT timeout, bool 
 	switch (param->ProxyType)
 	{
 	case PROXY_DIRECT:
-		sock = TcpConnectEx3(param->HostName, param->Port, timeout, cancel, NULL, true, NULL, false, false, NULL);
+//		sock = TcpConnectEx3(param->HostName, param->Port, timeout, cancel, NULL, true, NULL, false, false, NULL);
+		sock = TcpConnectEx3(param->HostName, param->Port, timeout, cancel, NULL, true, NULL, false, NULL);
 		if (sock == NULL)
 		{
 			err = ERR_CONNECT_FAILED;
@@ -758,7 +759,8 @@ BUF *HttpRequestEx2(URL_DATA *data, INTERNET_SETTING *setting,
 	else
 	{
 		// If the connection is not SSL via HTTP Proxy
-		s = TcpConnectEx3(con.ProxyHostName, con.ProxyPort, timeout_connect, cancel, NULL, true, NULL, false, false, NULL);
+//		s = TcpConnectEx3(con.ProxyHostName, con.ProxyPort, timeout_connect, cancel, NULL, true, NULL, false, false, NULL);
+		s = TcpConnectEx3(con.ProxyHostName, con.ProxyPort, timeout_connect, cancel, NULL, true, NULL, false, NULL);
 		if (s == NULL)
 		{
 			*error_code = ERR_PROXY_CONNECT_FAILED;
@@ -773,7 +775,8 @@ BUF *HttpRequestEx2(URL_DATA *data, INTERNET_SETTING *setting,
 	if (data->Secure)
 	{
 		// Start the SSL communication
-		if (StartSSLEx(s, NULL, NULL, true, 0, NULL) == false)
+//		if (StartSSLEx(s, NULL, NULL, true, 0, NULL) == false)
+		if (StartSSLEx(s, NULL, NULL, 0, NULL) == false)
 		{
 			// SSL connection failed
 			*error_code = ERR_PROTOCOL_ERROR;
