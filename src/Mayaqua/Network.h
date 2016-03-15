@@ -312,7 +312,7 @@ struct SOCK
 	IP Reverse_MyServerGlobalIp;	// Self global IP address when using the reverse socket
 	UINT Reverse_MyServerPort;		// Self port number when using the reverse socket
 	UCHAR Ssl_Init_Async_SendAlert[2];	// Initial state of SSL send_alert
-	bool AcceptOnlyTls;			// Accept only TLS (disable SSLv3)
+//	bool AcceptOnlyTls;			// Accept only TLS (disable SSLv3)
 	bool RawIP_HeaderIncludeFlag;
 
 #ifdef	ENABLE_SSL_LOGGING

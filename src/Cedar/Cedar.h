@@ -1052,7 +1052,7 @@ typedef struct CEDAR
 	UINT QueueBudget;				// Queue budget
 	LOCK *FifoBudgetLock;			// Fifo budget lock
 	UINT FifoBudget;				// Fifo budget
-	bool AcceptOnlyTls;				// Accept only TLS (Disable SSL)
+//	bool AcceptOnlyTls;				// Accept only TLS (Disable SSL)
 	char OpenVPNDefaultClientOption[MAX_SIZE];	// OpenVPN Default Client Option String
 } CEDAR;
 
