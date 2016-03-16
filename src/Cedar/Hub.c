@@ -7207,8 +7207,8 @@ HUB *NewHub(CEDAR *cedar, char *HubName, HUB_OPTION *option)
 	h->LogSetting.SecurityLogSwitchType = LOG_SWITCH_DAY;
 	h->LogSetting.PacketLogSwitchType = LOG_SWITCH_DAY;
 
-	MakeDir(HUB_SECURITY_LOG_DIR_NAME);
-	MakeDir(HUB_PACKET_LOG_DIR_NAME);
+//	MakeDir(HUB_SECURITY_LOG_DIR_NAME);
+//	MakeDir(HUB_PACKET_LOG_DIR_NAME);
 
 	// Start the packet logger
 	Format(packet_logger_name, sizeof(packet_logger_name), HUB_PACKET_LOG_FILE_NAME, h->Name);

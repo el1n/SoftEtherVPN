@@ -306,7 +306,7 @@ void FreeProbe()
 		char filename[MAX_SIZE];
 
 		// Write all to the file
-		MakeDirEx("@probe_log");
+//		MakeDirEx("@probe_log");
 
 		LocalTime(&st);
 

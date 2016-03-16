@@ -349,7 +349,7 @@ TINY_LOG *NewTinyLog()
 
 	LocalTime(&st);
 
-	MakeDir(TINY_LOG_DIRNAME);
+//	MakeDir(TINY_LOG_DIRNAME);
 
 	Format(name, sizeof(name), TINY_LOG_FILENAME,
 		st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond);

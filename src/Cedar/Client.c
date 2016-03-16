@@ -10628,7 +10628,7 @@ CLIENT *CiNewClient()
 	// Log Settings
 	if(c->NoSaveLog == false)
 	{
-		MakeDir(CLIENT_LOG_DIR_NAME);
+//		MakeDir(CLIENT_LOG_DIR_NAME);
 		c->Logger = NewLog(CLIENT_LOG_DIR_NAME, CLIENT_LOG_PREFIX, LOG_SWITCH_DAY);
 	}
 
